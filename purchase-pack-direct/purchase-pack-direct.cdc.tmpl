@@ -1,0 +1,81 @@
+import FungibleToken from ${FungibleTokenContractAddress}
+import NonFungibleToken from ${NonFungibleTokenContractAddress}
+import NFTStorefront from ${NFTStorefrontContractAddress}
+import PackNFT from ${PackNFTAddress}
+import ${NFTContractName} from ${NFTContractAddress}
+import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
+
+transaction(
+    storefrontAddress: Address,
+    listingResourceID: UInt64,
+    expectedPrice: UFix64
+) {
+    let paymentVault: @FungibleToken.Vault
+    let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
+    let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
+    let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
+    let balanceBeforeTransfer: UFix64
+    let mainDUCVault: &DapperUtilityCoin.Vault
+    let dappAddress: Address
+
+    prepare(dapp: AuthAccount, dapper: AuthAccount, userAcct: AuthAccount) {
+        self.dappAddress = dapp.address
+
+        // Initialize the collection if the buyer does not already have one
+        if userAcct.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
+            userAcct.save(<-${NFTContractName}.createEmptyCollection(), to: ${NFTContractName}.CollectionStoragePath
+            userAcct.link<&${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, ${NFTContractName}.MomentNFTCollectionPublic}>(
+                ${NFTContractName}.CollectionPublicPath,
+                target: ${NFTContractName}.CollectionStoragePath
+            )
+                ?? panic("Could not link collection Pub Path");
+        }
+
+        // Initialize the PackNFT collection if the buyer does not already have one
+        if userAcct.borrow<&PackNFT.Collection>(from: PackNFT.CollectionStoragePath) == nil {
+            userAcct.save(<-PackNFT.createEmptyCollection(), to: PackNFT.CollectionStoragePath);
+            userAcct.link<&{NonFungibleToken.CollectionPublic}>(PackNFT.CollectionPublicPath, target: PackNFT.CollectionStoragePath)
+                ?? panic("Could not link PackNFT.Collection Pub Path");
+        }
+
+        // Although the Storefront is available as a public capability, we want to borrow
+        // from storage so that we can enforce the need for PackNFT to sign this transaction
+        self.storefront = dapp
+            .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
+            .borrow()
+            ?? panic("Could not borrow a reference to the storefront")
+        self.listing = self.storefront.borrowListing(listingResourceID: listingResourceID)
+                    ?? panic("No Listing with that ID in Storefront")
+
+        let salePrice = self.listing.getDetails().salePrice
+        if expectedPrice != salePrice {
+            panic("Sale price not expected value")
+        }
+
+        self.mainDUCVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
+                    ?? panic("Could not borrow reference to Dapper Utility Coin vault")
+        self.balanceBeforeTransfer = self.mainDUCVault.balance
+        self.paymentVault <- self.mainDUCVault.withdraw(amount: salePrice)
+
+        self.buyerNFTCollection = userAcct
+            .getCapability<&{NonFungibleToken.CollectionPublic}>(PackNFT.CollectionPublicPath)
+            .borrow()
+            ?? panic("Cannot borrow NFT collection receiver from account")
+    }
+
+    pre {
+        self.dappAddress == 0xe4cf4bdc1751c65d && self.dappAddress == storefrontAddress: "Requires valid authorizing signature"
+    }
+
+    execute {
+        let item <- self.listing.purchase(
+            payment: <-self.paymentVault
+        )
+
+        self.buyerNFTCollection.deposit(token: <-item)
+    }
+
+    post {
+        self.mainDUCVault.balance == self.balanceBeforeTransfer: "DUC leakage"
+    }
+}

@@ -1,0 +1,10 @@
+import PackNFT from ${PackNFTContractAddress}
+import IPackNFT from ${IPackNFTContractAddress}
+
+// This transaction opens and reveals an on-chain pack.
+transaction(revealID: UInt64) {
+    prepare(owner: AuthAccount) {
+        let collectionRef = owner.borrow<&PackNFT.Collection>(from: PackNFT.CollectionStoragePath)!
+        collectionRef.borrowPackNFT(id: revealID)!.reveal(openRequest: true)
+    }
+}
