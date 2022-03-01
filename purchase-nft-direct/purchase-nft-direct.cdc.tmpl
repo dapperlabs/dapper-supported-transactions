@@ -1,0 +1,54 @@
+import FungibleToken from ${FungibleTokenContractAddress}
+import NonFungibleToken from ${NonFungibleTokenContractAddress}
+import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
+import NFTStorefront from ${NFTStorefrontContractAddress}
+import ${NFTContractName} from ${NFTContractAddress}
+
+transaction(listingResourceID: UInt64, storefrontAddress: Address, expectedPrice: UFix64) {
+    let paymentVault: @FungibleToken.Vault
+    let buyerCollection: &{${NFTContractName}.CollectionPublic}
+    let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
+    let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
+    let balanceBeforeTransfer: UFix64
+    let mainDucVault: &DapperUtilityCoin.Vault
+
+    prepare(dapper: AuthAccount, userAcct: AuthAccount) {
+        self.storefront = getAccount(storefrontAddress)
+            .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
+                NFTStorefront.StorefrontPublicPath
+            )!
+            .borrow()
+            ?? panic("Could not borrow Storefront from provided address")
+        self.listing = self.storefront.borrowListing(listingResourceID: listingResourceID)
+                    ?? panic("No Offer with that ID in Storefront")
+        let salePrice = self.listing.getDetails().salePrice
+        self.mainDucVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
+            ?? panic("Cannot borrow DapperUtilityCoin vault from dapper storage")
+
+        self.balanceBeforeTransfer = self.mainDucVault.balance
+        self.paymentVault <- self.mainDucVault.withdraw(amount: salePrice)
+
+        self.buyerCollection = userAcct
+            .getCapability<&{${NFTContractName}.CollectionPublic}>(${NFTContractName}.CollectionPublicPath)
+            .borrow()
+            ?? panic("Could not borrow Collection from provided address")
+    }
+
+    // Check that the price is right
+    pre {
+        self.salePrice == expectedPrice: "unexpected price"
+    }
+
+    execute {
+        let item <- self.listing.purchase(
+            payment: <-self.paymentVault
+        )
+
+        self.buyerCollection.deposit(token: <-item)
+    }
+
+    // Check that there was no DUC leakage in the sale
+    post {
+        self.mainDUCVault.balance == self.balanceBeforeTransfer: "DUC leakage"
+    }
+}
