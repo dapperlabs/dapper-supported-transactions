@@ -4,8 +4,8 @@ import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import NFTStorefront from ${NFTStorefrontContractAddress}
 import ${NFTContractName} from ${NFTContractAddress}
 
-// This transaction lists an NFT for sale such that some percentage of the sale revenue goes to
-// the dapp as a royalty.
+// This transcation can be used to place and NFT for sale on a marketplace such that a specified percentage of the proceeds of the sale
+// go to the dapp as a royalty.
 transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let sellerPaymentReceiver: Capability<&{FungibleToken.Receiver}>
     let nftProvider: Capability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
@@ -13,43 +13,48 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
     // It's important that the dapp account authorize this transaction so the dapp as the ability
     // to validate and approve the royalty included in the sale.
-    prepare(dappAcct: AuthAccount, userAcct: AuthAccount) {
+    prepare(dapp: AuthAccount, seller: AuthAccount) {
+        // Make sure dapp is actually the dapp and not some random account
+        if dapp.address != ${NFTContractAddress} {
+            panic("unexpected dapp address")
+        }
+
         // If the account doesn't already have a storefront, create one and add it to the account
-        if userAcct.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath) == nil {
+        if seller.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath) == nil {
             let newstorefront <- NFTStorefront.createStorefront() as! @NFTStorefront.Storefront
-            userAcct.save(<-newstorefront, to: NFTStorefront.StorefrontStoragePath)
-            userAcct.link<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
+            seller.save(<-newstorefront, to: NFTStorefront.StorefrontStoragePath)
+            seller.link<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
                 NFTStorefront.StorefrontPublicPath,
                 target: NFTStorefront.StorefrontStoragePath
             )
         }
 
         // Get a reference to the receiver that will receive the fungible tokens if the sale executes.
-        self.sellerPaymentReceiver = userAcct.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        self.sellerPaymentReceiver = seller.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
         assert(self.sellerPaymentReceiver.borrow() != nil, message: "Missing or mis-typed DapperUtilityCoin receiver")
 
         // If the user does not have their collection linked to their account, link it.
         let nftProviderPrivatePath = /private/${NFTContractName}CollectionProviderForNFTStorefront
-        let hasLinkedCollection = userAcct.
+        let hasLinkedCollection = seller.
             getCapability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
                 nftProviderPrivatePath
             )!.check()
         if !hasLinkedCollection {
-            userAcct.link<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
+            seller.link<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
                 nftProviderPrivatePath,
                 target: ${NFTContractName}.CollectionStoragePath
             )
         }
 
         // Get a capability to access the user's NFT collection.
-        self.nftProvider = userAcct.
+        self.nftProvider = seller.
             getCapability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
                 nftProviderPrivatePath
             )!
         assert(self.nftProvider.borrow() != nil, message: "Missing or mis-typed collection provider")
 
         // Get a reference to the user's NFT storefront
-        self.storefront = userAcct.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath)
+        self.storefront = seller.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath)
             ?? panic("Missing or mis-typed NFTStorefront Storefront")
 
         // Make sure this NFT is not already listed for sale in this storefront.

@@ -4,21 +4,23 @@ import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import NFTStorefront from ${NFTStorefrontContractAddress}
 import ${NFTContractName} from ${NFTContractAddress}
 
+// This transcation purchases an NFT on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This tranasction
+// will also initialize the buyer's NFT collection on their account if it has not already been initialized.
 transaction(listingResourceID: UInt64, storefrontAddress: Address, expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
     let nftCollection: &${NFTContractName}.Collection{NonFungibleToken.Receiver}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
     let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
-    let price: UFix64
+    let salePrice: UFix64
     let balanceBeforeTransfer: UFix64
     let mainDapperUtilityCoinVault: &DapperUtilityCoin.Vault
 
-    prepare(dapper: AuthAccount, userAcct: AuthAccount) {
+    prepare(dapper: AuthAccount, buyer: AuthAccount) {
         // Initialize the buyer's collection if they do not already have one
-        if userAcct.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
+        if buyer.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
             let collection <- ${NFTContractName}.createEmptyCollection() as! @${NFTContractName}.Collection
-            userAcct.save(<-collection, to: ${NFTContractName}.CollectionStoragePath)
-            userAcct.link<&{${NFTContractName}.CollectionPublic}>(
+            buyer.save(<-collection, to: ${NFTContractName}.CollectionStoragePath)
+            buyer.link<&{${NFTContractName}.CollectionPublic}>(
                 ${NFTContractName}.CollectionPublicPath,
                 target: ${NFTContractName}.CollectionStoragePath,
             )
@@ -35,13 +37,13 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, expectedPrice
         // Get the listing by ID from the storefront
         self.listing = self.storefront.borrowListing(listingResourceID: listingResourceID)
             ?? panic("No Offer with that ID in Storefront")
-        self.price = self.listing.getDetails().salePrice
+        self.salePrice = self.listing.getDetails().salePrice
 
         // Get a DUC vault from Dapper's account
         self.mainDapperUtilityCoinVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
             ?? panic("Cannot borrow DapperUtilityCoin vault from account storage")
         self.balanceBeforeTransfer = self.mainDapperUtilityCoinVault.balance
-        self.paymentVault <- self.mainDapperUtilityCoinVault.withdraw(amount: self.price)
+        self.paymentVault <- self.mainDapperUtilityCoinVault.withdraw(amount: self.salePrice)
 
         // Get the collection from the buyer so the NFT can be deposited into it
         self.nftCollection = buyer.borrow<&${NFTContractName}.Collection{NonFungibleToken.Receiver}>(
@@ -51,7 +53,7 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, expectedPrice
 
     // Check that the price is right
     pre {
-        self.price == expectedPrice: "unexpected price"
+        self.salePrice == expectedPrice: "unexpected price"
     }
 
     execute {

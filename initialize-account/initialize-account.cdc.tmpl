@@ -3,14 +3,14 @@ import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import FungibleToken from ${FungibleTokenContractAddress}
 import ${NFTContractName} from ${NFTContractAddress}
 
-// This transaction checks if the authorizing account has a collection already. If not, we create a new empty
-// collection and add it to the acccount.
+// This transcation initializes an account with a collection that allows it to hold NFTs from a specific contract. It will
+// do nothing if the account is already initialized.
 transaction {
-    prepare(userAcct: AuthAccount) {
-        if userAcct.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
+    prepare(collector: AuthAccount) {
+        if collector.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
             let collection <- ${NFTContractName}.createEmptyCollection() as! @${NFTContractName}.Collection
-            userAcct.save(<-collection, to: ${NFTContractName}.CollectionStoragePath)
-            userAcct.link<&{${NFTContractName}.CollectionPublic}>(
+            collector.save(<-collection, to: ${NFTContractName}.CollectionStoragePath)
+            collector.link<&{${NFTContractName}.CollectionPublic}>(
                 ${NFTContractName}.CollectionPublicPath,
                 target: ${NFTContractName}.CollectionStoragePath,
             )

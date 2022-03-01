@@ -1,42 +1,58 @@
 import FungibleToken from ${FungibleTokenContractAddress}
 import NonFungibleToken from ${NonFungibleTokenContractAddress}
-import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import NFTStorefront from ${NFTStorefrontContractAddress}
+import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import ${NFTContractName} from ${NFTContractAddress}
 
-transaction(listingResourceID: UInt64, storefrontAddress: Address, expectedPrice: UFix64) {
+// This transcation purchases an NFT from a dapp directly (i.e. **not** on a peer-to-peer marketplace).
+transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
-    let buyerCollection: &{${NFTContractName}.CollectionPublic}
+    let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}
     let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}
     let balanceBeforeTransfer: UFix64
-    let mainDucVault: &DapperUtilityCoin.Vault
+    let mainDUCVault: &DapperUtilityCoin.Vault
+    let dappAddress: Address
+    let salePrice: UFix64
 
-    prepare(dapper: AuthAccount, userAcct: AuthAccount) {
-        self.storefront = getAccount(storefrontAddress)
-            .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(
-                NFTStorefront.StorefrontPublicPath
-            )!
+    prepare(dapp: AuthAccount, dapper: AuthAccount, buyer: AuthAccount) {
+        self.dappAddress = dapp.address
+
+        // Initialize the collection if the buyer does not already have one
+        if buyer.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
+            buyer.save(<-${NFTContractName}.createEmptyCollection(), to: ${NFTContractName}.CollectionStoragePath
+            buyer.link<&${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, ${NFTContractName}.MomentNFTCollectionPublic}>(
+                ${NFTContractName}.CollectionPublicPath,
+                target: ${NFTContractName}.CollectionStoragePath
+            )
+                ?? panic("Could not link collection Pub Path");
+        }
+
+        // Although the Storefront is available as a public capability, we want to borrow
+        // from storage so that we can enforce the need for PackNFT to sign this transaction
+        self.storefront = dapp
+            .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
             .borrow()
-            ?? panic("Could not borrow Storefront from provided address")
+            ?? panic("Could not borrow a reference to the storefront")
         self.listing = self.storefront.borrowListing(listingResourceID: listingResourceID)
-                    ?? panic("No Offer with that ID in Storefront")
-        let salePrice = self.listing.getDetails().salePrice
-        self.mainDucVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
-            ?? panic("Cannot borrow DapperUtilityCoin vault from dapper storage")
+            ?? panic("No Listing with that ID in Storefront")
 
-        self.balanceBeforeTransfer = self.mainDucVault.balance
-        self.paymentVault <- self.mainDucVault.withdraw(amount: salePrice)
+        self.salePrice = self.listing.getDetails().salePrice
 
-        self.buyerCollection = userAcct
-            .getCapability<&{${NFTContractName}.CollectionPublic}>(${NFTContractName}.CollectionPublicPath)
+        self.mainDUCVault = dapper.borrow<&DapperUtilityCoin.Vault>(from: /storage/dapperUtilityCoinVault)
+                    ?? panic("Could not borrow reference to Dapper Utility Coin vault")
+        self.balanceBeforeTransfer = self.mainDUCVault.balance
+        self.paymentVault <- self.mainDUCVault.withdraw(amount: self.salePrice)
+
+        self.buyerNFTCollection = buyer
+            .getCapability<&{NonFungibleToken.CollectionPublic}>(PackNFT.CollectionPublicPath)
             .borrow()
-            ?? panic("Could not borrow Collection from provided address")
+            ?? panic("Cannot borrow NFT collection receiver from account")
     }
 
-    // Check that the price is right
     pre {
         self.salePrice == expectedPrice: "unexpected price"
+        self.dappAddress == ${NFTContractAddress} && self.dappAddress == storefrontAddress: "Requires valid authorizing signature"
     }
 
     execute {
@@ -44,10 +60,9 @@ transaction(listingResourceID: UInt64, storefrontAddress: Address, expectedPrice
             payment: <-self.paymentVault
         )
 
-        self.buyerCollection.deposit(token: <-item)
+        self.buyerNFTCollection.deposit(token: <-item)
     }
 
-    // Check that there was no DUC leakage in the sale
     post {
         self.mainDUCVault.balance == self.balanceBeforeTransfer: "DUC leakage"
     }

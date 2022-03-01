@@ -4,8 +4,8 @@ import NFTStorefront from ${NFTStorefrontContractAddress}
 transaction(listingResourceID: UInt64) {
     let storefront: &NFTStorefront.Storefront{NFTStorefront.StorefrontManager}
 
-    prepare(acct: AuthAccount) {
-        self.storefront = acct.borrow<&NFTStorefront.Storefront{NFTStorefront.StorefrontManager}>(from: NFTStorefront.StorefrontStoragePath)
+    prepare(seller: AuthAccount) {
+        self.storefront = seller.borrow<&NFTStorefront.Storefront{NFTStorefront.StorefrontManager}>(from: NFTStorefront.StorefrontStoragePath)
             ?? panic("Missing or mis-typed NFTStorefront.Storefront")
     }
 
