@@ -10,14 +10,12 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let sellerPaymentReceiver: Capability<&{FungibleToken.Receiver}>
     let nftProvider: Capability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>
     let storefront: &NFTStorefront.Storefront
+    let dappAddress: Address
 
     // It's important that the dapp account authorize this transaction so the dapp as the ability
     // to validate and approve the royalty included in the sale.
     prepare(dapp: AuthAccount, seller: AuthAccount) {
-        // Make sure dapp is actually the dapp and not some random account
-        if dapp.address != ${NFTContractAddress} {
-            panic("unexpected dapp address")
-        }
+        self.dappAddress = dapp.address
 
         // If the account doesn't already have a storefront, create one and add it to the account
         if seller.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath) == nil {
@@ -67,6 +65,11 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
                 }
             }
         }
+    }
+
+    // Make sure dapp is actually the dapp and not some random account
+    pre {
+        self.dappAddress == ${NFTContractAddress}: "Requires valid authorizing signature"
     }
 
     execute {
