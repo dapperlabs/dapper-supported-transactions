@@ -3,8 +3,8 @@ import IPackNFT from ${IPackNFTContractAddress}
 
 // This transcation opens an on-chain pack, revealing its contents and placing them into the account's NFT collection.
 transaction(revealID: UInt64) {
-    prepare(userAcct: AuthAccount) {
-        let collectionRef = userAcct.borrow<&PackNFT.Collection>(from: PackNFT.CollectionStoragePath)!
+    prepare(owner: AuthAccount) {
+        let collectionRef = owner.borrow<&PackNFT.Collection>(from: PackNFT.CollectionStoragePath)!
         collectionRef.borrowPackNFT(id: revealID)!.reveal(openRequest: true)
     }
 }

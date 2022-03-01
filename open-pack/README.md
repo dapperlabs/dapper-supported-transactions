@@ -8,4 +8,4 @@ This transcation opens an on-chain pack, revealing its contents and placing them
 
 ## Transaction Authorizers
 
-`userAcct` is the Dapper user's account. This is the account that owns the pack that is to be opened. Dapper will provide this signature.
+`owner` is the Dapper user's account. This is the account that owns the pack that is to be opened. Dapper will provide this signature.
