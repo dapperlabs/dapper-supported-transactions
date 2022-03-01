@@ -15,4 +15,4 @@ Check out the templates and find the one that fits your use case best. Let's say
 ```shell
 $ bash render.sh create-listing testnet
 ```
-This command will output the result to `create-listing/create-listing.cdc` and will print the SHA2 256 script hash.
+This command will output the result to `create-listing/create-listing-testnet.cdc` and will print the SHA2 256 script hash.
