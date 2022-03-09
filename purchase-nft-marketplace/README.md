@@ -1,6 +1,6 @@
 # Purchase NFT (Marketplace)
 
-This transcation purchases an NFT on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This tranasction
+This transcation purchases an NFT on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This transaction
 will also initialize the buyer's NFT collection on their account if it has not already been initialized.
 
 ## Transaction Arguments

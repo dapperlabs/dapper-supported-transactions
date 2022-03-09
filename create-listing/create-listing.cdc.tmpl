@@ -12,7 +12,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
     let storefront: &NFTStorefront.Storefront
     let dappAddress: Address
 
-    // It's important that the dapp account authorize this transaction so the dapp as the ability
+    // It's important that the dapp account authorize this transaction so the dapp has the ability
     // to validate and approve the royalty included in the sale.
     prepare(dapp: AuthAccount, seller: AuthAccount) {
         self.dappAddress = dapp.address

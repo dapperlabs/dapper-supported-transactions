@@ -5,7 +5,7 @@ import PackNFT from ${PackNFTAddress}
 import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import ${NFTContractName} from ${NFTContractAddress}
 
-// This transcation purchases a pack on from a dapp. This tranasction will also initialize the buyer's account with a pack NFT
+// This transaction purchases a pack from a dapp. This transaction will also initialize the buyer's account with a pack NFT
 // collection and an NFT collection if it does not already have them.
 transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
@@ -37,8 +37,6 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, expectedPrice
                 ?? panic("Could not link PackNFT.Collection Pub Path");
         }
 
-        // Although the Storefront is available as a public capability, we want to borrow
-        // from storage so that we can enforce the need for PackNFT to sign this transaction
         self.storefront = dapp
             .getCapability<&NFTStorefront.Storefront{NFTStorefront.StorefrontPublic}>(NFTStorefront.StorefrontPublicPath)
             .borrow()

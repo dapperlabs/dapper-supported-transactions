@@ -1,8 +1,8 @@
 # Purchase NFT (Direct)
 
-This transcation purchases an NFT from a dapp directly (i.e. **not** on a peer-to-peer marketplace).
+This transaction purchases an NFT from a dapp directly (i.e. **not** on a peer-to-peer marketplace).
 
-This tranaction should be used in conjunction with an NFT reservation system that can reserve an NFT specifically
+This transaction should be used in conjunction with an NFT reservation system that can reserve an NFT specifically
 for the buyer before this transaction is signed as a means of ensuring it is available for purchase by the specific
 buyer in this transaction. Direct purchase of NFTs from dapps without reservation is not recommended as it introduces
 a variety of security and usability concerns.
