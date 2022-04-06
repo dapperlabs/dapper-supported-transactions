@@ -4,7 +4,7 @@ import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import NFTStorefront from ${NFTStorefrontContractAddress}
 import ${NFTContractName} from ${NFTContractAddress}
 
-// This transcation purchases an NFT on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This tranasction
+// This transaction purchases an NFT on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This transaction
 // will also initialize the buyer's NFT collection on their account if it has not already been initialized.
 transaction(listingResourceID: UInt64, storefrontAddress: Address, expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
