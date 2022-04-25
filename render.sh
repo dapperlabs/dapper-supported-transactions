@@ -8,12 +8,16 @@ then
 fi
 
 # Compute paths to the .env file and the template file
-env_file="$1/$2.env"
 template_file="$1/$1.cdc.tmpl"
 output_file="$1/$1-$2.cdc"
 
-# Populate environment with values from the .env file
-export $(cat $env_file | xargs)
+# overlay model
+if test -f "$2.env"; then
+  export $(cat "$2.env" | xargs)
+fi
+if test -f "$1/$2.env"; then
+  export $(cat "$1/$2.env" | xargs)
+fi
 
 # Render the template
 envsubst < $template_file > $output_file
