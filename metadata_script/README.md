@@ -1,11 +1,9 @@
-# Open Pack
+# Metadata Script
 
-This transcation opens an on-chain pack, revealing its contents and placing them into the account's NFT collection.
+Every purchase transaction for the Dapper Wallet requires a metadata script. This script is used to display the NFT being purchased to the buyer during the checkout flow. Arguments passed to this metadata script should be a subset of the arguments passed to the associated purchase transaction.
 
-## Transaction Arguments
+## Script Arguments
 
-`revealID: UInt64` is the ID of the pack NFT to reveal.
+Arguments passed to this metadata script should be a subset of the arguments passed to the associated purchase transaction. We strongly recommend that the argument ordering should be identical to that of the transaction.
 
-## Transaction Authorizers
-
-`owner` is the Dapper user's account. This is the account that owns the pack that is to be opened. Dapper will provide this signature.
+Typical transaction like one shared here uses metadata view implementation to extract the metadata info and return that to the script caller.
