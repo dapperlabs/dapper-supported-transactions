@@ -28,7 +28,8 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         }
 
         // Get a reference to the receiver that will receive the fungible tokens if the sale executes.
-        self.sellerPaymentReceiver = seller.getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
+        // Note that the sales receiver aka MerchantAddress should be an account owned by Dapper or an end-user Dapper Wallet account address.
+        self.sellerPaymentReceiver = getAccount(${MerchantAddress}).getCapability<&{FungibleToken.Receiver}>(/public/dapperUtilityCoinReceiver)
         assert(self.sellerPaymentReceiver.borrow() != nil, message: "Missing or mis-typed DapperUtilityCoin receiver")
 
         // If the user does not have their collection linked to their account, link it.
@@ -79,6 +80,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         let amountRoyalty = saleItemPrice - amountSeller
 
         // Get the royalty recipient's public account object
+        // Note that the royalty receiver should be an account owned by Dapper (aka MerchantAddress) or an end-user Dapper Wallet account address.
         let royaltyRecipient = getAccount(${RoyaltyReceiverAddress})
 
         // Get a reference to the royalty recipient's Receiver
