@@ -3,6 +3,9 @@
 This transcation can be used to place and NFT for sale on a marketplace such that a specified percentage of the proceeds of the sale
 go to the dapp as a royalty.
 
+Important note: Sales proceeds recipient and royalty recipients need to be either the dapp's merchant address (shared by the Dapper team
+with the dapp project team) or an end-user Dapper Wallet account address.
+
 ## Transaction Arguments
 
 `saleItemID: UInt64` specifies the ID of the NFT that will be put up for sale.
