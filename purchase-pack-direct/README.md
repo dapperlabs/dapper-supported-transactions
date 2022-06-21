@@ -9,6 +9,7 @@ buyer in this transaction. Direct purchase of pack NFTs from dapps without reser
 a variety of security and usability concerns.
 
 ## Transaction Arguments
+`merchantAccountAddress: Address` is the official merchant account of the dapp. Dapper team will share this account with the dapp project team.
 
 `listingResourceID: UInt64` is the ID of the listing that holds the pack NFT that is to be purchased.
 
