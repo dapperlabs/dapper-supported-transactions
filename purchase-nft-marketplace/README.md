@@ -4,6 +4,7 @@ This transcation purchases an NFT on a peer-to-peer marketplace (i.e. **not** di
 will also initialize the buyer's NFT collection on their account if it has not already been initialized.
 
 ## Transaction Arguments
+`merchantAccountAddress: Address` is the official merchant account of the dapp. Dapper team will share this account with the dapp project team.
 
 `listingResourceID: UInt64` is the ID of the listing that holds the NFT that is to be purchased.
 
