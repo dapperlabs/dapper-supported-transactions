@@ -1,3 +1,6 @@
+## DEPRECATED 
+This section is deprecated. For sales proceed of the storefront use either a merchant account provided by Dapper team or account address of a Dapper Wallet user.
+
 ## Setup Merchant Account
 To sell from your own Flow account, a dapp should setup DUC (Dapper Utility Coin) auto-forwarder and receiver in their Flow account. The transaction shared here shows how to do that.
 
