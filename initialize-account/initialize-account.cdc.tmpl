@@ -10,7 +10,7 @@ transaction {
         if collector.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
             let collection <- ${NFTContractName}.createEmptyCollection() as! @${NFTContractName}.Collection
             collector.save(<-collection, to: ${NFTContractName}.CollectionStoragePath)
-            collector.link<&{${NFTContractName}.CollectionPublic}>(
+            collector.link<&{${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
                 ${NFTContractName}.CollectionPublicPath,
                 target: ${NFTContractName}.CollectionStoragePath,
             )
