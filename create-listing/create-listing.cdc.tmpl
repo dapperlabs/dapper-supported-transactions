@@ -55,17 +55,6 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         // Get a reference to the user's NFT storefront
         self.storefront = seller.borrow<&NFTStorefront.Storefront>(from: NFTStorefront.StorefrontStoragePath)
             ?? panic("Missing or mis-typed NFTStorefront Storefront")
-
-        // Make sure this NFT is not already listed for sale in this storefront.
-        let existingOffers = self.storefront.getListingIDs()
-        if existingOffers.length > 0 {
-            for listingResourceID in existingOffers {
-                let listing: &NFTStorefront.Listing{NFTStorefront.ListingPublic}? = self.storefront.borrowListing(listingResourceID: listingResourceID)
-                if listing != nil && listing!.getDetails().nftID == saleItemID && listing!.getDetails().nftType == Type<@${NFTContractName}.NFT>(){
-                    self.storefront.removeListing(listingResourceID: listingResourceID)
-                }
-            }
-        }
     }
 
     // Make sure dapp is actually the dapp and not some random account
