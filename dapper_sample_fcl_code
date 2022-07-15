@@ -1,0 +1,17 @@
+// This FCL code snippet showcases FCL code interaction with the Dapper Wallet
+const dapperAuthz = fcl.authz;
+
+    const tx = await fcl.send([
+      fcl.transaction(buyTx),
+      fcl.payer(fcl.authz),
+      fcl.proposer(fcl.authz),
+      fcl.authorizations([dapperAuthz, fcl.authz]),
+      fcl.args([
+        fcl.arg(Number(30227649), t.UInt64),
+        fcl.arg('0x8fb4a6a11757b80d', t.Address),
+        fcl.arg(Number(100).toFixed(8), t.UFix64),
+      ]),
+      fcl.limit(1000),
+    ]).then(tx => {
+      return fcl.decode(tx);
+    });
