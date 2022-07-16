@@ -34,8 +34,8 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
         // If the user does not have their collection linked to their account, link it.
         let nftProviderPrivatePath = /private/${NFTContractName}CollectionProviderForNFTStorefront
-        let hasLinkedCollection = seller.
-            getCapability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
+        let hasLinkedCollection = seller
+            .getCapability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
                 nftProviderPrivatePath
             )!.check()
         if !hasLinkedCollection {
@@ -46,8 +46,8 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
         }
 
         // Get a capability to access the user's NFT collection.
-        self.nftProvider = seller.
-            getCapability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
+        self.nftProvider = seller
+            .getCapability<&${NFTContractName}.Collection{NonFungibleToken.Provider, NonFungibleToken.CollectionPublic}>(
                 nftProviderPrivatePath
             )!
         assert(self.nftProvider.borrow() != nil, message: "Missing or mis-typed collection provider")
