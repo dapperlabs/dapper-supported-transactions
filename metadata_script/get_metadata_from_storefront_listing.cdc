@@ -4,10 +4,10 @@ import Flunks from 0xe666c53e1758dec6
 
 pub struct PurchaseData {
     pub let id: UInt64
-    pub let name: String?
+    pub let name: String
     pub let amount: UFix64
-    pub let description: String?
-    pub let imageURL: String?
+    pub let description: String
+    pub let imageURL: String
 
     init(id: UInt64, name: String?, amount: UFix64, description: String?, imageURL: String?) {
         self.id = id
