@@ -21,11 +21,11 @@ transaction(merchantAccountAddress: Address, storefrontAddress: Address, listing
         // Initialize the collection if the buyer does not already have one
         if buyer.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
             buyer.save(<-${NFTContractName}.createEmptyCollection(), to: ${NFTContractName}.CollectionStoragePath
-            buyer.link<&${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, ${NFTContractName}.MomentNFTCollectionPublic}>(
+            buyer.link<&{${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
                 ${NFTContractName}.CollectionPublicPath,
                 target: ${NFTContractName}.CollectionStoragePath
             )
-                ?? panic("Could not link collection Pub Path");
+             ?? panic("Could not link collection Pub Path");
         }
 
         self.storefront = dapp
