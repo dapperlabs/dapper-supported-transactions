@@ -20,10 +20,12 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64,  expectedPric
         if buyer.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
             let collection <- ${NFTContractName}.createEmptyCollection() as! @${NFTContractName}.Collection
             buyer.save(<-collection, to: ${NFTContractName}.CollectionStoragePath)
-            buyer.link<&{${NFTContractName}.CollectionPublic}>(
+            
+            buyer.link<&{${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
                 ${NFTContractName}.CollectionPublicPath,
-                target: ${NFTContractName}.CollectionStoragePath,
+                target: ${NFTContractName}.CollectionStoragePath
             )
+             ?? panic("Could not link collection Pub Path");
         }
 
         // Get the storefront reference from the seller
