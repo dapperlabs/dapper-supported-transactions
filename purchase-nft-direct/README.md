@@ -15,13 +15,17 @@ a variety of security and usability concerns.
 `storefrontAddress: Address` is the address of the account that is selling the NFT. This should be the same as the NFT contract
 address.
 
-`expectedPrice: UFix64` is the price of the sale. This is used by Dapper in the purchase flow.
+`saleItemPrice: UFix64` is the price that the NFT will be listed for.
+
+If the listing is purchased using DapperUtilityCoin, this price will be in USD. i.e. if `saleItemPrice` is `1.50`, the item costs USD $1.50
+
+If the listing is purchased using FlowUtilityToken, this price will be in Flow. i.e. if `saleItemPrice` is `1.50`, the item costs 1.50 Flow
 
 ## Transaction Authorizers
 
 `dapp` is the dapp's account. This is the account that holds the NFT being purchased. It's important that the dapp signs this
 transaction as a means of verifying that the NFT being purchased is reserved specifically for the buyer.
 
-`dapper` is Dapper's payer account that provides the DapperUtilityCoin (DUC) for the purchase. Dapper user accounts cannot hold DUC.
+`dapper` is Dapper's payer account that provides the DapperUtilityCoin/FlowUtilityToken (DUC/FUT) for the purchase. Dapper user accounts cannot hold DUC/FUT.
 
 `buyer` is the Dapper user's account. This is the account that owns the pack that is to be opened. Dapper will provide this signature.
