@@ -10,8 +10,11 @@ with the dapp project team) or an end-user Dapper Wallet account address.
 
 `saleItemID: UInt64` specifies the ID of the NFT that will be put up for sale.
 
-`saleItemPrice: UFix64` is the price that the NFT will be listed for. Because the listing will be purchased using DapperUtilityCoin,
-this price will be in USD. In other words, if `saleItemPrice` is `1.50`, the item costs USD $1.50.
+`saleItemPrice: UFix64` is the price that the NFT will be listed for. 
+
+If the listing is purchased using DapperUtilityCoin, this price will be in USD. i.e. if `saleItemPrice` is `1.50`, the item costs USD $1.50
+
+If the listing is purchased using FlowUtilityToken, this price will be in Flow. i.e. if `saleItemPrice` is `1.50`, the item costs 1.50 Flow
 
 `royaltyPercent: UFix64` is the precent of the sale price that will be taken by the dapp as a royalty if someone purchases this NFT represented
 as a value between 0 and 1. It's important that the dapp validates this argument before signing the transaction.
