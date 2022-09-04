@@ -55,7 +55,7 @@ pub fun main(merchantAccountAddress: Address, address: Address, listingResourceI
             amount: listingDetails.salePrice,
             description: display.description,
             imageURL: display.thumbnail.uri(),
-            paymentVaultTypeID: listing.salePaymentVaultType
+            paymentVaultTypeID: listingDetails.salePaymentVaultType
         )
         
         return purchaseData
