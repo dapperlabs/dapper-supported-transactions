@@ -2,7 +2,7 @@
 
 This repository contains Flow transaction scripts that the Dapper wallet will support by default. Following these transaction templates will allow for safer and easier integration between dapps and the Dapper Flow wallet. Of course, more transactions will be evaluated and safelisted within the Dapper system as new use cases arise.
 
-## Checklist 
+## Checklist for developers submitting transactions for review
 1. Purchase transactions:
 
     a) Make sure the first argument is either the merchant account address or storefront address
@@ -24,6 +24,17 @@ This repository contains Flow transaction scripts that the Dapper wallet will su
 
 
 ## Supporting $FLOW payments
+Supporting $FLOW purchase on a Dapper Dapp requires the following changes:
+1. Smart Contracts: No changes are needed. Please make sure your NFT contracts follow Flow nft standard, implement metadata standard, and are added to the Flow NFT Catalog.
+2. Transactions: Similar to how you built transactions with Dapper Utility Coin ($DUC) to enable fiat payments for the Dapper Wallet, you need to build transactions with Flow Utility Token ($FUT) for $FLOW payments. 
+3. Base your transactions on the templates included in this repo.
+4. Create NFT sale listing in $FUT. See this. In case of P2P listing, your code should check if the seller Flow account has a $FUT receiver setup. If not, you should warn the user that they can not receive $FLOW by listing items for sale.
+5. Craft your purchase transactions to use $FUT. See the template transactions in this repo.
+6. Metadata Scripts for Purchase transactions: We are adding a new field in the metadata PurchaseData struct called `pub let paymentVaultTypeID: Type`. You can fill the new field by calling getType() function of the payment vault type. It is possible to construct a transaction/metadata script that works for $DUC and $FUT as long as this new metadata field is used. See the example in this repo.
+7. Frontend/FCL code: Obviously, your frontend should show listings in $FLOW rather than $USD. In addition to that, your code should check if the end-user Flow account has a $FUT receiver setup. If not, you should warn the user that they can not receive $FLOW by listing items for sale. Other than that, no changes are needed for supporting $FLOW payments with the Dapper Wallet.
+
+Note the $FUT deployment addresses are in mainnet.env and testnet.env files in this repo.
+
 
 ## Rendering Transaction Templates
 
