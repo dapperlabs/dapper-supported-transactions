@@ -7,6 +7,7 @@ import ${NFTContractName} from ${NFTContractAddress}
 
 // This transaction purchases a pack from a dapp. This transaction will also initialize the buyer's account with a pack NFT
 // collection and an NFT collection if it does not already have them.
+// FIRST ARGUMENT OF THIS TRANSACTION MUST BE YOUR MERCHANT ACCOUNT ADDRESS PROVIDED BY DAPPER LABS
 transaction(merchantAccountAddress: Address, storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
     let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
