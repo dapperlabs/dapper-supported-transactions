@@ -6,6 +6,7 @@ import ${NFTContractName} from ${NFTContractAddress}
 
 // This transaction purchases an NFT on a peer-to-peer marketplace (i.e. **not** directly from a dapp). This transaction
 // will also initialize the buyer's NFT collection on their account if it has not already been initialized.
+// FIRST ARGUMENT OF A P2P PURCHASE TRANSACTION SHOULD ALWAYS BE THE SELLER'S ADDRESS
 transaction(storefrontAddress: Address, listingResourceID: UInt64,  expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
     let nftCollection: &${NFTContractName}.Collection{NonFungibleToken.Receiver}
