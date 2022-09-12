@@ -5,6 +5,7 @@ import DapperUtilityCoin from ${DapperUtilityCoinContractAddress}
 import ${NFTContractName} from ${NFTContractAddress}
 
 // This transaction purchases an NFT from a dapp directly (i.e. **not** on a peer-to-peer marketplace).
+// FIRST ARGUMENT OF THIS TRANSACTION MUST BE YOUR MERCHANT ACCOUNT ADDRESS PROVIDED BY DAPPER LABS
 transaction(merchantAccountAddress: Address, storefrontAddress: Address, listingResourceID: UInt64, expectedPrice: UFix64) {
     let paymentVault: @FungibleToken.Vault
     let buyerNFTCollection: &AnyResource{NonFungibleToken.CollectionPublic}
