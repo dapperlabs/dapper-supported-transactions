@@ -18,6 +18,7 @@ transaction(merchantAccountAddress: Address, storefrontAddress: Address, listing
     let dappAddress: Address
     let salePrice: UFix64
 
+    // "dapp" as authorizer is optional
     prepare(dapp: AuthAccount, dapper: AuthAccount, buyer: AuthAccount) {
         self.dappAddress = dapp.address
 
