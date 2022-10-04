@@ -14,6 +14,7 @@ transaction(saleItemID: UInt64, saleItemPrice: UFix64, royaltyPercent: UFix64) {
 
     // It's important that the dapp account authorize this transaction so the dapp has the ability
     // to validate and approve the royalty included in the sale.
+    // "dapp" as authorizer is not needed if you hardcode royalty/royaltyRecipient in the transaction
     prepare(dapp: AuthAccount, seller: AuthAccount) {
         self.dappAddress = dapp.address
 
