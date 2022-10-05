@@ -1,6 +1,6 @@
 # Create Listing
 
-This transcation can be used to place and NFT for sale on a marketplace such that a specified percentage of the proceeds of the sale
+This transaction can be used to place and NFT for sale on a marketplace such that a specified percentage of the proceeds of the sale
 go to the dapp as a royalty.
 
 Important note: Sales proceeds recipient and royalty recipients need to be either the dapp's merchant address (shared by the Dapper team
@@ -10,7 +10,7 @@ with the dapp project team) or an end-user Dapper Wallet account address.
 
 `saleItemID: UInt64` specifies the ID of the NFT that will be put up for sale.
 
-`saleItemPrice: UFix64` is the price that the NFT will be listed for. 
+`saleItemPrice: UFix64` is the price that the NFT will be listed for.
 
 If the listing is purchased using DapperUtilityCoin, this price will be in USD. i.e. if `saleItemPrice` is `1.50`, the item costs USD $1.50
 
