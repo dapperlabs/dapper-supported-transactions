@@ -41,11 +41,18 @@ Note the $FUT deployment addresses are in mainnet.env and testnet.env files in t
 ```shell
 $ bash render.sh [TEMPLATE_NAME] [NETWORK]
 ```
+or
+```shell
+$ bash all.sh [NETWORK] // loops directories
+```
 
-Check out the templates and find the one that fits your use case best. Let's say it's `create-listing`, and you'd like to render a transaction template for use on `testnet`.
+## Rendering Transaction Environment
 
-1. Open `create-listing/testnet.env` and fill in the missing template variables.
-2. Run the folowing command to render the template using the variables you set in `testnet.env`
+Overlay environment with each folder `<tx-name>/<network>.env` and shared `./<network>.env` both optional
+
+Example 
+1. Open `create-listing/testnet.env` or `./testnet.env` and fill in the missing template variables.
+2. Run the folowing command to render `testnet.env`
 ```shell
 $ bash render.sh create-listing testnet
 ```
