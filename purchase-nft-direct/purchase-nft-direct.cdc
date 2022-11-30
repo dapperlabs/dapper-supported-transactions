@@ -23,7 +23,7 @@ transaction(merchantAccountAddress: Address, storefrontAddress: Address, listing
 
         // Initialize the collection if the buyer does not already have one
         if buyer.borrow<&${NFTContractName}.Collection>(from: ${NFTContractName}.CollectionStoragePath) == nil {
-            buyer.save(<-${NFTContractName}.createEmptyCollection(), to: ${NFTContractName}.CollectionStoragePath
+            buyer.save(<-${NFTContractName}.createEmptyCollection(), to: ${NFTContractName}.CollectionStoragePath)
             buyer.link<&{${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
                 ${NFTContractName}.CollectionPublicPath,
                 target: ${NFTContractName}.CollectionStoragePath
