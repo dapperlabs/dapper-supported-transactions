@@ -29,7 +29,7 @@ transaction(storefrontAddress: Address, listingResourceID: UInt64, commissionRec
             let collection <- ${NFTContractName}.createEmptyCollection() as! @${NFTContractName}.Collection
             buyer.save(<-collection, to: ${NFTContractName}.CollectionStoragePath)
             
-            buyer.link<&{${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
+            buyer.link<&${NFTContractName}.Collection{NonFungibleToken.CollectionPublic, MetadataViews.ResolverCollection}>(
                 ${NFTContractName}.CollectionPublicPath,
                 target: ${NFTContractName}.CollectionStoragePath
             )
